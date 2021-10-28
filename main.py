@@ -1,18 +1,19 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler
-import re
-
-class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-    def _send_response(self, response_text : str = 'Empty', code : int = 200):
-        self.send_response(code)
-        self.end_headers()
-        self.wfile.write(bytes(response_text, 'utf-8'))
-
-    def do_GET(self):
-        
-        self._send_response(a)
+import socket
+import ClientProcessor
 
 
-a = 'hi dude'
+HOST = '127.0.0.1'
+PORT = 8081
+BUFFER_SIZE = 1024
 
-httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)
-httpd.serve_forever()
+clients = {}
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    sock.bind((HOST, PORT))
+    sock.listen()
+    print("socket is running")
+    while True:
+        connection, address = sock.accept()
+        print("connected by", address)
+        client_processor = ClientProcessor.ClientProcessor(address, connection)
+        client_processor.start()
