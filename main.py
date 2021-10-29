@@ -2,8 +2,8 @@ import socket
 import ClientProcessor
 
 
-HOST = '127.0.0.1'
-PORT = 8081
+HOST = '0.0.0.0'
+PORT = 10001
 BUFFER_SIZE = 1024
 
 clients = {}

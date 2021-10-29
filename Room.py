@@ -1,4 +1,5 @@
 import Game
+import time
 
 
 EMPTY_CLIENT = None
@@ -24,6 +25,7 @@ class Room:
             self.clients[player_id].send({'message_type': 'finished', 'results': self.get_results()})
             if self.clients[1 - player_id] is not None:
                 self.clients[1 - player_id].send({'message_type': 'finished', 'results': self.get_results()})
+            self.game = None
 
     def on_player_answered(self, player_id):
         message = {
@@ -46,6 +48,8 @@ class Room:
         self.clients[1].send(message)
 
     def start_game(self):
+        print(self.clients)
+        print(self.id)
         if self.clients[1] is not None:
             self.game = Game.Game(self.on_player_answered, self.on_player_mistaken, self.on_player_finished)
 
@@ -53,36 +57,37 @@ class Room:
                 'message_type': 'start_game',
                 'dividers_count': len(self.game.dividers)
             }
-
+            print(message)
             # print(self.clients)
 
             self.clients[0].send(message)
             self.clients[1].send(message)
-
-            # print("therethere")
-            question0, number0 = self.game.get_question(0)
-            self.clients[0].send({'message_type': 'question', 'variants': question0, 'number': number0})
-
-            question1, number1 = self.game.get_question(1)
-            self.clients[1].send({'message_type': 'question', 'variants': question1, 'number': number1})
+            print("sending questions")
             return True
         else:
             return False
 
     def connect_to_room(self, client, nickname):
+        print("connect to room")
+        print(client, nickname)
         if self.clients[1] is None:
             self.clients[1] = client
             self.nicknames[1] = nickname
+            print("connected")
 
             self.clients[0].send({'message_type': "connected_player", "nickname": nickname})
             self.clients[1].send({'message_type': 'connected_player', "nickname": self.nicknames[0]})
+            print("clients are notified")
+            time.sleep(0.5)
+            print(self.clients)
             return True
         else:
             return False
 
     def exit(self, client_id):
-        self.clients[1 - client_id].send({'message_type': 'disconnected_player', 'nickname': self.nicknames[client_id]})
-
+        print("disconnected player {}".format(client_id))
+        if self.clients[1 - client_id] is not None:
+            self.clients[1 - client_id].send({'message_type': 'disconnected_player', 'nickname': self.nicknames[client_id]})
         self.clients[client_id] = EMPTY_CLIENT
         self.nicknames[client_id] = ''
 

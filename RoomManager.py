@@ -8,6 +8,7 @@ rooms = {}
 def create_room(client, nickname):
     if len(free_ids) > 0:
         id = next(iter(free_ids))
+        free_ids.remove(id)
         rooms[id] = Room.Room(id, client, nickname)
         return id
     else:
@@ -23,6 +24,7 @@ def close_room(room_id):
 
 
 def connect_to_room(id, client, nickname):
+    print("connect to room {}".format(id))
     if id in rooms.keys():
         return rooms[id].connect_to_room(client, nickname)
     else:
