@@ -25,23 +25,14 @@ def generate_dividers(hard_primes_count=1, medium_primes_count=1, easy_primes_co
 
 
 class Game:
-    number = 1
-    dividers = []
-    client_progress = [0, 0]
-    client_numbers = [1, 1]
-    client_mistakes = [0, 0]
-    client_finish_time = [-1, -1]
-    begin_time = 0
-
-    answer_callback = None
-    mistake_callback = None
-    finish_callback = None
-
     def __init__(self, answer_callback, mistake_callback, finish_callback):
         self.answer_callback = answer_callback
         self.mistake_callback = mistake_callback
         self.finish_callback = finish_callback
 
+        self.client_progress = [0, 0]
+        self.client_finish_time = [-1, -1]
+        self.client_mistakes = [0, 0]
         self.begin_time = time.time()
         self.dividers, self.number = generate_dividers()
         self.client_numbers = [self.number, self.number]

@@ -87,20 +87,20 @@ class Room:
     def exit(self, client_id):
         print("disconnected player {}".format(client_id))
         if self.clients[1 - client_id] is not None:
-            self.clients[1 - client_id].send({'message_type': 'disconnected_player', 'nickname': self.nicknames[client_id]})
+            self.clients[1 - client_id].send({'message_type': 'disconnected_player', 'nickname': self.nicknames[client_id]}, isPriority=False)
         self.clients[client_id] = EMPTY_CLIENT
         self.nicknames[client_id] = ''
 
     def get_results(self):
         return {
-            self.nicknames[0]: {
-                'mistakes': self.game.client_mistakes[0],
-                'progress': self.game.client_progress[0],
-                'time': self.game.client_finish_time[0] - self.game.begin_time
-            },
-            self.nicknames[1]: {
-                'mistakes': self.game.client_mistakes[1],
-                'progress': self.game.client_progress[1],
-                'time': self.game.client_finish_time[1] - self.game.begin_time
-            }
+            self.nicknames[0]: str({
+                'mistakes': str(self.game.client_mistakes[0]),
+                'progress': str(self.game.client_progress[0]),
+                'time': str(self.game.client_finish_time[0] - self.game.begin_time)
+            }),
+            self.nicknames[1]: str({
+                'mistakes': str(self.game.client_mistakes[1]),
+                'progress': str(self.game.client_progress[1]),
+                'time': str(self.game.client_finish_time[1] - self.game.begin_time)
+            })
         }

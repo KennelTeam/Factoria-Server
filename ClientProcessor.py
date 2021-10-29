@@ -34,13 +34,14 @@ class ClientProcessor(threading.Thread):
             print("Unexpected error!!")
             print(str(e))
 
-    def send(self, data):
+    def send(self, data, isPriority=True):
         for key in data.keys():
             data[key] = str(data[key])
         try:
             self.connection.sendall(json.dumps(data, ensure_ascii=False).encode('utf-8'))
         except socket.error as e:
-            self.process_error(e)
+            if isPriority:
+                self.process_error(e)
 
     def connect_to_room(self, room_id, nickname):
         self.room_id = room_id
@@ -111,7 +112,7 @@ class ClientProcessor(threading.Thread):
             if 'room_id' not in data.keys() or 'nickname' not in data.keys():
                 result = False
             else:
-                result = self.connect_to_room(data['room_id'], data['nickname'])
+                result = self.connect_to_room(int(data['room_id']), data['nickname'])
             response = {'status': result, 'message_type': 'response'}
             self.send(response)
         elif message_type == 'create_room':
@@ -159,3 +160,4 @@ class ClientProcessor(threading.Thread):
                 if not data:
                     self.running = False
                 self.process(data)
+        self.leave_room()
