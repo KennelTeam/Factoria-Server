@@ -1,0 +1,11 @@
+{"message_type": "start_game"}
+{"message_type": "create_room", "nickname": "Host"}
+#
+{
+    "message_type": "connect_to_room",
+    "room_id": 2,
+    "nickname": "pc_player"
+}
+#
+
+The message which is located between hashtags is sent when you press any key on your keyboard

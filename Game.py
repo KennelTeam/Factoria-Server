@@ -39,7 +39,6 @@ class Game:
         random.shuffle(self.dividers)
 
     def get_question(self, player_id):
-        # print("there")
         dividers_begin_index = self.client_progress[player_id]
 
         if dividers_begin_index == len(self.dividers):
@@ -50,11 +49,9 @@ class Game:
         while var1 in self.dividers[dividers_begin_index:]:
             var1 = random.choice(ALL_PRIMES)
         variants.append(var1)
-        # print("there2")
         var2 = random.choice(ALL_PRIMES)
         while var2 in self.dividers[dividers_begin_index:] + [var1]:
             var2 = random.choice(ALL_PRIMES)
-        # print("there3")
         variants.append(var2)
         variants.append(self.dividers[dividers_begin_index])
         random.shuffle(variants)
@@ -66,12 +63,14 @@ class Game:
             self.client_progress[player_id] += 1
             self.answer_callback(player_id)
 
+            print('Checking finish')
             if self.client_progress[player_id] == len(self.dividers):
+                print('Yeah it\'s finish')
                 self.client_finish_time[player_id] = time.time()
                 self.finish_callback(player_id)
+
             return True
         else:
             self.client_mistakes[player_id] += 1
             self.mistake_callback(player_id)
             return False
-

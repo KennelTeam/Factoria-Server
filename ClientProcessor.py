@@ -32,23 +32,25 @@ class ClientProcessor(threading.Thread):
             self.leave_room()
         else:
             print("Unexpected error!!")
-            print(str(e))
+            print(str(error))
 
     def send(self, data, isPriority=True):
+        print(self.ident, data)
         for key in data.keys():
             data[key] = str(data[key])
         try:
-            self.connection.sendall(json.dumps(data, ensure_ascii=False).encode('utf-8'))
+            self.connection.sendall(json.dumps(
+                data, ensure_ascii=False).encode('utf-8'))
         except socket.error as e:
             if isPriority:
                 self.process_error(e)
 
     def connect_to_room(self, room_id, nickname):
-        self.room_id = room_id
-        self.nickname = nickname
-        result = RoomManager.connect_to_room(self.room_id, self, self.nickname)
+        result = RoomManager.connect_to_room(room_id, self, nickname)
         if result:
             self.client_id = 1
+            self.room_id = room_id
+            self.nickname = nickname
         return result
 
     def create_room(self, nickname):
@@ -63,19 +65,18 @@ class ClientProcessor(threading.Thread):
 
     def leave_room(self):
         if self.room_id != -1 and self.room_id in RoomManager.rooms.keys():
+            print("Leaving", self.client_id)
             RoomManager.rooms[self.room_id].exit(self.client_id)
             result = True
         else:
             result = False
-        self.send({'status': result, 'message_type': 'response'})
-        if self.client_id == 0:
-            RoomManager.close_room(self.room_id)
         if result:
             self.running = False
 
     def answer(self, answer):
         if self.room_id != -1 and RoomManager.rooms[self.room_id].game is not None:
-            result = RoomManager.rooms[self.room_id].game.answer_question(self.client_id, answer)
+            result = RoomManager.rooms[self.room_id].game.answer_question(
+                self.client_id, answer)
         else:
             result = False
 
@@ -90,30 +91,33 @@ class ClientProcessor(threading.Thread):
         return response
 
     def get_question(self):
-        print("get question")
-        if RoomManager.rooms[self.room_id].game is not None:
-            question, number = RoomManager.rooms[self.room_id].game.get_question(self.client_id)
-            print(question, number)
+        if self.room_id in RoomManager.rooms and RoomManager.rooms[self.room_id].game is not None:
+            question, number = RoomManager.rooms[self.room_id].game.get_question(
+                self.client_id)
             if question is not None:
                 time.sleep(0.5)
-                self.send({'message_type': 'question', 'variants': question, 'number': number})
+                self.send({'message_type': 'question',
+                          'variants': question, 'number': number})
 
     def process(self, data):
         try:
             data = data.decode('utf-8')
             data = json.loads(data)
-            print(data)
             message_type = data['message_type']
         except Exception as e:
             return
 
         if message_type == 'connect_to_room':
-            print("connect to room")
             if 'room_id' not in data.keys() or 'nickname' not in data.keys():
                 result = False
             else:
-                result = self.connect_to_room(int(data['room_id']), data['nickname'])
-            response = {'status': result, 'message_type': 'response'}
+                result = self.connect_to_room(
+                    int(data['room_id']), data['nickname'])
+                if result:
+                    response = {'status': True, 'message_type': 'response'}
+                else:
+                    response = {'status': "No room with this ID",
+                                'message_type': 'response'}
             self.send(response)
         elif message_type == 'create_room':
             if 'nickname' in data.keys():
@@ -146,7 +150,6 @@ class ClientProcessor(threading.Thread):
             else:
                 response = {'status': False, 'message_type': 'response'}
             self.send(response)
-
 
     def run(self):
         self.running = True
