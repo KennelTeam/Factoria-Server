@@ -3,7 +3,7 @@
 #
 {
     "message_type": "connect_to_room",
-    "room_id": 2,
+    "room_id": 1,
     "nickname": "pc_player"
 }
 #

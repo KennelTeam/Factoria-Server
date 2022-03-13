@@ -73,10 +73,10 @@ class ClientProcessor(threading.Thread):
         if result:
             self.running = False
 
-    def answer(self, answer):
+    def answer(self, answer, points_me, points_enemy):
         if self.room_id != -1 and RoomManager.rooms[self.room_id].game is not None:
             result = RoomManager.rooms[self.room_id].game.answer_question(
-                self.client_id, answer)
+                self.client_id, answer, points_me, points_enemy)
         else:
             result = False
 
@@ -133,7 +133,8 @@ class ClientProcessor(threading.Thread):
             if 'answer' not in data.keys():
                 result = False
             else:
-                result = self.answer(data['answer'])
+                result = self.answer(
+                    data['answer'], data['points_me'], data['points_enemy'])
 
             self.send({'status': result, 'message_type': 'response'})
 

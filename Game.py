@@ -57,17 +57,19 @@ class Game:
         random.shuffle(variants)
         return variants, self.client_numbers[player_id]
 
-    def answer_question(self, player_id, divider):
+    def answer_question(self, player_id, divider, points_me, points_enemy):
         if divider == self.dividers[self.client_progress[player_id]]:
             self.client_numbers[player_id] //= self.dividers[self.client_progress[player_id]]
             self.client_progress[player_id] += 1
             self.answer_callback(player_id)
 
-            print('Checking finish')
             if self.client_progress[player_id] == len(self.dividers):
                 print('Yeah it\'s finish')
                 self.client_finish_time[player_id] = time.time()
-                self.finish_callback(player_id)
+                if points_me > points_enemy:
+                    self.finish_callback(player_id)
+                else:
+                    self.finish_callback(points_enemy)
 
             return True
         else:
