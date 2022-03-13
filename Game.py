@@ -69,7 +69,7 @@ class Game:
                 if points_me > points_enemy:
                     self.finish_callback(player_id)
                 else:
-                    self.finish_callback(points_enemy)
+                    self.finish_callback(1 - player_id)
 
             return True
         else:
