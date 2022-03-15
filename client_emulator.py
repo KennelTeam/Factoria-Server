@@ -2,7 +2,7 @@ import socket
 from threading import Thread
 
 HOST = "127.0.0.1"  # The server's hostname or IP address
-PORT = 10001  # The port used by the server
+PORT = 5001  # The port used by the server
 
 
 def receiver(sock):
